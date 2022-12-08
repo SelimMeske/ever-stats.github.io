@@ -2,6 +2,25 @@ let response = (async () =>
     (await (await fetch("https://api.dzabalama.com/quiz")).json())
 )();
 
+let checkFormat = (quizQuestions, quizName) => {
+    let wrongFormatImages = [];
+
+    for (let i = 0; i < quizQuestions.length; i++) {
+        let quizQuestion = quizQuestions[i].questionURL;
+        if (!quizQuestion.includes('png')) {
+            if (!quizQuestion.includes('jpeg')) {
+                if(!quizQuestion.includes('webp')) {
+                    if (!quizQuestion.includes('jpg')) {
+                        wrongFormatImages.push({image: quizQuestion, name: quizName})
+                    }
+                }
+            }
+        }
+    }
+
+    return wrongFormatImages;
+}
+
 response.then((response) => {
     console.log(response);
     console.log(response.name)
@@ -42,6 +61,34 @@ response.then((response) => {
 
         
         const main = document.getElementById('main');
-        main.appendChild(container)
+        const format = document.getElementById('formats');
+
+        let wrongFormats = checkFormat(list_reversed[i].questions, questionName);
+
+        if (wrongFormats.length > 0) {
+            for (let i = 0; i < wrongFormats.length; i++) {
+                const image = document.createElement('img');
+                const quizName = document.createElement('p');
+                const container = document.createElement('div');
+                
+                image.width = 200;
+                image.src = wrongFormats[i].image;
+                quizName.innerHTML = wrongFormats[i].name;
+
+                container.appendChild(image);
+                container.appendChild(quizName);
+
+                container.id = 'quizContainer formatContainer';
+
+                container.style.border = "2px solid black";
+                container.style.padding = '5px';
+                container.style.marginBottom = "10px";
+
+                format.appendChild(container);
+                format.style.display = "flex";
+            }
+        }
+        
+        main.appendChild(container);
     }
 })
